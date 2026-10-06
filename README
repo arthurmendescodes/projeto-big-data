@@ -18,3 +18,5 @@ npm install
 ## Executar
 
 npx expo start
+
+Leia o QR code com o app Expo Go
