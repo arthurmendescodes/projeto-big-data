@@ -15,4 +15,4 @@ npm install
 
 ## Executar
 
-npx expo start
+npx expo start 
