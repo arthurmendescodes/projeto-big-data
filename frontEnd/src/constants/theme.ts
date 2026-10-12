@@ -6,25 +6,43 @@
 import "@/global.css";
 
 import { Platform } from "react-native";
-
 export const Colors = {
   light: {
-    text: "#000000",
-    textInput: "#000000",
-    background: "#ffffff",
-    backgroundElement: "#F0F0F3",
-    backgroundSelected: "#E0E1E6",
-    textSecondary: "#60646C",
+    text: "#362F27",
+    textInput: "#362F27",
+    background: "#F7F1E7",
+    backgroundElement: "#EDE3D5",
+    backgroundSelected: "#E3D3C0",
+    textSecondary: "#805F43",
   },
   dark: {
-    text: "#ffffff",
-    textInput: "#ffffff",
-    background: "#000000",
-    backgroundElement: "#212225",
-    backgroundSelected: "#2E3135",
-    textSecondary: "#B0B4BA",
+    text: "#FAF3DD",
+    textInput: "#FAF3DD",
+    background: "#302A24",
+    backgroundElement: "#362F27",
+    backgroundSelected: "#6F5741",
+    textSecondary: "#C4AE94",
   },
 } as const;
+
+// export const Colors = {
+//   light: {
+//     text: "#000000",
+//     textInput: "#000000",
+//     background: "#ffffff",
+//     backgroundElement: "#F0F0F3",
+//     backgroundSelected: "#E0E1E6",
+//     textSecondary: "#60646C",
+//   },
+//   dark: {
+//     text: "#ffffff",
+//     textInput: "#ffffff",
+//     background: "#000000",
+//     backgroundElement: "#212225",
+//     backgroundSelected: "#2E3135",
+//     textSecondary: "#B0B4BA",
+//   },
+// } as const;
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 

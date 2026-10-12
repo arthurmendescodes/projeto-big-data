@@ -48,7 +48,7 @@ export function ThemedTextInput({
         type === "code" && styles.code,
         style,
       ]}
-      {...rest}
+      // {...rest}
     />
   );
 }

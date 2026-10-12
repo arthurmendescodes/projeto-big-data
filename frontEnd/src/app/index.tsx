@@ -38,49 +38,45 @@ const index = () => {
 
   const Login = async () => {
     router.push("/home");
+    // router.push("/addEvento");
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView style={styles.container}>
-        <ThemedView>
-          {/* banner da ControlUP no meio */}
-          <View style={styles.areaBanner}>
-            {/* <Image style={styles.banner} source={banner} /> */}
-          </View>
+      {/* <SafeAreaView style={styles.container}> */}
+      <ThemedView style={styles.container}>
+        <View style={styles.areaBanner}>
+          {/* <Image style={styles.banner} source={banner} /> */}
+        </View>
 
-          <View>
-            <ThemedText style={styles.titulo}>Login</ThemedText>
-            <ThemedTextInput style={styles.subTitulo}>
-              Insira seus dados de login para entrar
-            </ThemedTextInput>
-            {/* area dos inputs de Nome e Senha */}
-            <ThemedTextInput
-              style={styles.input}
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-            />
-            <ThemedTextInput
-              style={styles.input}
-              placeholder="Senha"
-              value={senha}
-              onChangeText={setSenha}
-              secureTextEntry={true}
-              autoCapitalize="none"
-            />
-            {/* botão de login que chama a função logar */}
-            <View style={{ paddingTop: 10 }}>
-              <TouchableOpacity style={styles.botaoLogin} onPress={Login}>
-                <TouchableOpacity>
-                  <ThemedText style={styles.botaoTexto}>Entrar</ThemedText>
-                </TouchableOpacity>
-              </TouchableOpacity>
-            </View>
-          </View>
+        <ThemedText style={styles.titulo}>Login</ThemedText>
+        <ThemedTextInput style={styles.subTitulo}>
+          Insira seus dados de login para entrar
+        </ThemedTextInput>
+        {/* area dos inputs de Nome e Senha */}
+        <ThemedTextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+        />
+        <ThemedTextInput
+          style={styles.input}
+          placeholder="Senha"
+          value={senha}
+          onChangeText={setSenha}
+          secureTextEntry={true}
+          autoCapitalize="none"
+        />
+        {/* botão de login que chama a função logar */}
+        <ThemedView>
+          <TouchableOpacity style={styles.botaoLogin} onPress={Login}>
+            <ThemedText style={styles.botaoTexto}>Entrar</ThemedText>
+          </TouchableOpacity>
         </ThemedView>
-      </SafeAreaView>
+      </ThemedView>
+      {/* </SafeAreaView> */}
     </TouchableWithoutFeedback>
   );
 };
@@ -91,6 +87,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // justifyContent: "center",
+    // ...({ overflowX: "hidden" } as any),
   },
 
   areaBanner: {
