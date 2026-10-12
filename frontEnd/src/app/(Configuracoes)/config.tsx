@@ -87,7 +87,7 @@ export default function Configuracoes() {
             </View>
 
             <View style={styles.textos}>
-              <ThemedText style={styles.nome}>Mudar Tema</ThemedText>
+              <ThemedText style={styles.opcao}>Mudar Tema</ThemedText>
 
               <ThemedText style={styles.descricao}>
                 {themeMode === "light" ? "Modo Claro " : "Modo Escuro"}
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 4,
   },
-  nome: {
+  opcao: {
     fontSize: 16,
     fontWeight: "600",
   },
