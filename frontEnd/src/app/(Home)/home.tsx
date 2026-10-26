@@ -9,6 +9,7 @@ import {
   ChevronRight,
 } from "lucide-react-native";
 
+import ConfirmaVoltar from "@/components/ConfirmaVoltar";
 import { ThemedView } from "@/components/themed-view";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/hooks/use-theme";
@@ -16,6 +17,8 @@ import { useTheme } from "@/hooks/use-theme";
 export default function MenuPrincipal() {
   const router = useRouter();
   const theme = useTheme();
+
+  ConfirmaVoltar();
 
   const opcoes = [
     {
