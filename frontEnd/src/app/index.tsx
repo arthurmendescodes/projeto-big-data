@@ -50,9 +50,9 @@ const index = () => {
         </View>
 
         <ThemedText style={styles.titulo}>Login</ThemedText>
-        <ThemedTextInput style={styles.subTitulo}>
+        <ThemedText style={styles.subTitulo}>
           Insira seus dados de login para entrar
-        </ThemedTextInput>
+        </ThemedText>
         {/* area dos inputs de Nome e Senha */}
         <ThemedTextInput
           style={styles.input}
@@ -110,7 +110,8 @@ const styles = StyleSheet.create({
   subTitulo: {
     textAlign: "center",
     // fontsize: 50,
-    paddingBottom: 5,
+    // paddingBottom: 5,
+    padding: 5,
   },
 
   input: {

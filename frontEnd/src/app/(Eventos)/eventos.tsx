@@ -22,7 +22,7 @@ export default function MenuPrincipal() {
   const opcoes = [
     {
       titulo: "Adicionar Evento",
-      descricao: "Consulte os itens disponíveis",
+      descricao: "Registre eventos",
       Icone: CalendarPlus,
       rota: "/addEvento",
     },

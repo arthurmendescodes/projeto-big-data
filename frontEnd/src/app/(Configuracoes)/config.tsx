@@ -29,19 +29,6 @@ export default function Configuracoes() {
   const { themeMode, changeTheme } = useAppTheme();
 
   const theme = useTheme();
-  // <ThemedView style={styles.container}>
-  //   <ThemedText style={styles.botaoTexto}>Mudar tema</ThemedText>
-  //   <Switch
-  //     value={themeMode === "light" ? true : false}
-  //     onValueChange={() =>
-  //       changeTheme(themeMode === "light" ? "dark" : "light")
-  //     }
-  //   ></Switch>
-  //   <ThemedText>
-  //     {themeMode === "light" ? "Modo Claro " : "Modo Escuro"}
-  //   </ThemedText>
-  // </ThemedView>
-
   return (
     <ThemedView
       style={[styles.container, { backgroundColor: theme.background }]}

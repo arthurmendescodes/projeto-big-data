@@ -10,13 +10,16 @@ import { useState } from "react";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
+
+import { useTheme } from "@/hooks/use-theme";
+
+// placeholder dos dados--
 import ListaEstoque from "@/components/ListaEstoque";
 import { DADOSESTOQUE } from "@/components/ListaEstoque";
-import { useTheme } from "@/hooks/use-theme";
+// -----------------------
 
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@expo/ui/community/datetime-picker";
-import { Color } from "expo-router";
 
 export default function Estoque() {
   const theme = useTheme();
