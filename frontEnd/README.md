@@ -17,7 +17,7 @@ npm install
 
 npx expo start 
 
-##Caso dê erro por causo do SDK58
+## Caso dê erro por causo do SDK58
 
 delete o node_modules - (rm -rf node_modules)
 delete o package-lock.json - (rm package-lock.json)  
