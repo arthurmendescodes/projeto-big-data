@@ -11,6 +11,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 import { useTheme } from "@/hooks/use-theme";
+import { BotaoVoltar } from "@/components/BotaoVoltar";
 
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@expo/ui/community/datetime-picker";
@@ -22,6 +23,8 @@ export default function AddEvento() {
   const [tipoEvento, setTipoEvento] = useState("");
   const [local, setLocal] = useState("");
   const [date, setDate] = useState(new Date());
+  const [baixas, setBaixas] = useState("");
+  const [entradas, setEntradas] = useState("");
   const [obs, setObs] = useState("");
   const [mode, setMode] = useState<"date" | "time">("date");
   const [show, setShow] = useState(false);
@@ -49,8 +52,11 @@ export default function AddEvento() {
         <View
           style={[styles.header, { backgroundColor: theme.backgroundElement }]}
         >
-          <View style={styles.headerTexts}>
-            <ThemedText style={styles.titulo}>Registrar Evento</ThemedText>
+          <View style={styles.headerTop}>
+            <BotaoVoltar />
+            <View style={styles.headerTexts}>
+              <ThemedText style={styles.titulo}>Registrar Evento</ThemedText>
+            </View>
           </View>
 
           <ThemedText style={styles.subTitulo}>
@@ -86,11 +92,31 @@ export default function AddEvento() {
                 label="Missa"
                 value="missa"
               />
-              <Picker.Item label="Procissão" value="procissao" />
-              <Picker.Item label="Festa" value="festa" />
-              <Picker.Item label="Leilão" value="leilao" />
-              <Picker.Item label="Bingo" value="bingo" />
-              <Picker.Item label="Outro" value="outro" />
+              <Picker.Item
+                style={{ backgroundColor: theme.background, color: theme.text }}
+                label="Procissão"
+                value="procissao"
+              />
+              <Picker.Item
+                style={{ backgroundColor: theme.background, color: theme.text }}
+                label="Festa"
+                value="festa"
+              />
+              <Picker.Item
+                style={{ backgroundColor: theme.background, color: theme.text }}
+                label="Leilão"
+                value="leilao"
+              />
+              <Picker.Item
+                style={{ backgroundColor: theme.background, color: theme.text }}
+                label="Bingo"
+                value="bingo"
+              />
+              <Picker.Item
+                style={{ backgroundColor: theme.background, color: theme.text }}
+                label="Outro"
+                value="outro"
+              />
             </Picker>
           </View>
 
@@ -105,6 +131,7 @@ export default function AddEvento() {
             ]}
             placeholder="Local..."
             value={local}
+            onChangeText={setLocal}
           ></ThemedTextInput>
 
           <ThemedText style={styles.categoria}>Data</ThemedText>
@@ -168,8 +195,8 @@ export default function AddEvento() {
               },
             ]}
             placeholder="Baixas..."
-            value={obs}
-            onChangeText={setObs}
+            value={baixas}
+            onChangeText={setBaixas}
             multiline
           />
 
@@ -184,8 +211,8 @@ export default function AddEvento() {
               },
             ]}
             placeholder="Entradas..."
-            value={obs}
-            onChangeText={setObs}
+            value={entradas}
+            onChangeText={setEntradas}
             multiline
           />
 
@@ -228,8 +255,9 @@ export default function AddEvento() {
 
 const styles = StyleSheet.create({
   container: {
-    // paddingBottom: "10%",
+    paddingBottom: "10%",
     flex: 1,
+    paddingTop: "10%",
   },
 
   scrollContent: {
@@ -268,9 +296,6 @@ const styles = StyleSheet.create({
 
   subTitulo: {
     fontSize: 12,
-    lineHeight: 18,
-    marginTop: 12,
-    // color: "#7B8AA4",
   },
 
   badge: {

@@ -18,8 +18,31 @@ import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@expo/ui/community/datetime-picker";
 import { Color } from "expo-router";
 
+import BarraPesquisa from "@/components/BarraPesquisa";
+import { BotaoVoltar } from "@/components/BotaoVoltar";
+
+//  {
+//     id: "1",
+//     tipoEvento: "Missa",
+//     local: " Igreja Matriz",
+//     data: "12/10/2026",
+//     hora: "20:00",
+//   },
+
 export default function HistoricoEventos() {
   const theme = useTheme();
+  const [itemBuscado, setItemBuscado] = useState("");
+
+  const normalizarTexto = (texto: string) =>
+    texto
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  // função de pesquisa por itens específicos.
+  const itensFiltrados = DADOSTESTE.filter((item) =>
+    normalizarTexto(item.tipoEvento).includes(normalizarTexto(itemBuscado)),
+  );
 
   return (
     <ThemedView
@@ -34,8 +57,13 @@ export default function HistoricoEventos() {
         <View
           style={[styles.header, { backgroundColor: theme.backgroundElement }]}
         >
-          <View style={styles.headerTexts}>
-            <ThemedText style={styles.titulo}>Histórico de Eventos</ThemedText>
+          <View style={styles.headerTop}>
+            <BotaoVoltar />
+            <View style={styles.headerTexts}>
+              <ThemedText style={styles.titulo}>
+                Histórico de Eventos
+              </ThemedText>
+            </View>
           </View>
 
           <ThemedText style={styles.subTitulo}>
@@ -44,20 +72,11 @@ export default function HistoricoEventos() {
         </View>
 
         <View>
-          <ThemedTextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: theme.backgroundElement,
-                borderColor: theme.backgroundSelected,
-              },
-            ]}
-            placeholder="Procurar eventos..."
-          />
+          <BarraPesquisa value={itemBuscado} onChangeText={setItemBuscado} />
         </View>
         {/* lista de eventos */}
         <View>
-          {DADOSTESTE.map((item) => (
+          {itensFiltrados.map((item) => (
             <ListaHistorico key={item.id} item={item} />
           ))}
         </View>
@@ -75,6 +94,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+    paddingTop: "10%",
   },
 
   scrollContent: {
@@ -113,9 +133,6 @@ const styles = StyleSheet.create({
 
   subTitulo: {
     fontSize: 12,
-    lineHeight: 18,
-    marginTop: 12,
-    // color: "#7B8AA4",
   },
 
   badge: {
@@ -208,7 +225,7 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
   },
 
-  textEntrada: {
+  textoEntrada: {
     color: "#059669",
     fontSize: 9,
   },

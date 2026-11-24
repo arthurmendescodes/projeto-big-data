@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
+import { useRouter } from "expo-router";
 
 import { useState } from "react";
 import { ThemedText } from "@/components/themed-text";
@@ -16,13 +17,29 @@ import { useTheme } from "@/hooks/use-theme";
 // placeholder dos dados--
 import ListaEstoque from "@/components/ListaEstoque";
 import { DADOSESTOQUE } from "@/components/ListaEstoque";
+import BarraPesquisa from "@/components/BarraPesquisa";
 // -----------------------
 
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@expo/ui/community/datetime-picker";
+import { ArrowLeft } from "lucide-react-native";
 
 export default function Estoque() {
   const theme = useTheme();
+  const [itemBuscado, setItemBuscado] = useState("");
+  const router = useRouter();
+
+  const normalizarTexto = (texto: string) =>
+    texto
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+
+  // função de pesquisa por itens específicos.
+  const itensFiltrados = DADOSESTOQUE.filter((item) =>
+    normalizarTexto(item.nome).includes(normalizarTexto(itemBuscado)),
+  );
 
   return (
     <ThemedView
@@ -37,30 +54,33 @@ export default function Estoque() {
         <View
           style={[styles.header, { backgroundColor: theme.backgroundElement }]}
         >
-          <View style={styles.headerTexts}>
-            <ThemedText style={styles.titulo}>Estoque</ThemedText>
+          <View style={styles.headerTitleRow}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              accessibilityRole="button"
+              accessibilityLabel="Voltar"
+              hitSlop={8}
+            >
+              <ArrowLeft size={24} color={theme.text} />
+            </TouchableOpacity>
+
+            <View style={styles.headerTexts}>
+              <ThemedText style={styles.titulo}>Estoque</ThemedText>
+            </View>
           </View>
 
-          <ThemedText style={styles.subTitulo}>
-            Cheque os itens do estoque.
+          <ThemedText style={styles.subtitulo}>
+            Cheque os itens do Estoque.
           </ThemedText>
         </View>
 
         <View>
-          <ThemedTextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: theme.backgroundElement,
-                borderColor: theme.backgroundSelected,
-              },
-            ]}
-            placeholder="Procurar item..."
-          />
+          <BarraPesquisa value={itemBuscado} onChangeText={setItemBuscado} />
         </View>
         {/* lista de ESTOQUE */}
         <View>
-          {DADOSESTOQUE.map((item) => (
+          {itensFiltrados.map((item) => (
             <ListaEstoque key={item.id} item={item} />
           ))}
         </View>
@@ -72,6 +92,7 @@ export default function Estoque() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: "10%",
   },
 
   scrollContent: {
@@ -92,6 +113,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
+  headerTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   headerTexts: {
     flex: 1,
   },
@@ -108,11 +140,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  subTitulo: {
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 12,
-    // color: "#7B8AA4",
+  subtitulo: {
+    fontSize: 15,
   },
 
   badge: {

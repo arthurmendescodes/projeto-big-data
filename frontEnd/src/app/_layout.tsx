@@ -12,6 +12,7 @@ import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider as NavigationThemeProvider,
+  useTheme,
 } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -19,6 +20,7 @@ import { AppThemeProvider, useAppTheme } from "@/components/ThemeContext";
 
 function AppNavigation() {
   const { themeMode } = useAppTheme();
+  const theme = useTheme();
 
   return (
     <NavigationThemeProvider
@@ -27,14 +29,15 @@ function AppNavigation() {
       <SafeAreaProvider>
         <StatusBar style={themeMode === "dark" ? "light" : "dark"} />
 
-        <Stack>
+        <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
 
           <Stack.Screen
             name="(Home)/home"
             options={{
-              title: "Home",
-              headerBackTitle: "Voltar",
+              headerShown: false,
+              // title: "Home",
+              // headerBackTitle: "Voltar",
             }}
           />
         </Stack>

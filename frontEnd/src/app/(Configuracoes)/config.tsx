@@ -24,6 +24,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useAppTheme } from "@/components/ThemeContext";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { BotaoVoltar } from "@/components/BotaoVoltar";
 
 export default function Configuracoes() {
   const { themeMode, changeTheme } = useAppTheme();
@@ -42,8 +43,11 @@ export default function Configuracoes() {
         <View
           style={[styles.header, { backgroundColor: theme.backgroundElement }]}
         >
-          <View style={styles.headerTexts}>
-            <ThemedText style={styles.titulo}>Configurações</ThemedText>
+          <View style={styles.headerTop}>
+            <BotaoVoltar />
+            <View style={styles.headerTexts}>
+              <ThemedText style={styles.titulo}>Configurações</ThemedText>
+            </View>
           </View>
 
           <ThemedText style={styles.subtitulo}>Personalize seu App!</ThemedText>
@@ -90,6 +94,7 @@ export default function Configuracoes() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: "10%",
   },
   scrollContent: {
     paddingBottom: 24,
@@ -101,6 +106,12 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#D8DEE8",
+  },
+
+  headerTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
 
   headerTexts: {

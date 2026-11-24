@@ -14,8 +14,9 @@ import {
 import { ThemedView } from "@/components/themed-view";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/hooks/use-theme";
+import { BotaoVoltar } from "@/components/BotaoVoltar";
 
-export default function MenuPrincipal() {
+export default function Eventos() {
   const router = useRouter();
   const theme = useTheme();
 
@@ -47,8 +48,11 @@ export default function MenuPrincipal() {
         <View
           style={[styles.header, { backgroundColor: theme.backgroundElement }]}
         >
-          <View style={styles.headerTexts}>
-            <ThemedText style={styles.titulo}>Menu Principal</ThemedText>
+          <View style={styles.headerTop}>
+            <BotaoVoltar />
+            <View style={styles.headerTexts}>
+              <ThemedText style={styles.titulo}>Eventos</ThemedText>
+            </View>
           </View>
 
           <ThemedText style={styles.subtitulo}>
@@ -97,6 +101,7 @@ export default function MenuPrincipal() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: "10%",
   },
   scrollContent: {
     paddingBottom: 24,
@@ -108,6 +113,12 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#D8DEE8",
+  },
+
+  headerTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
 
   headerTexts: {

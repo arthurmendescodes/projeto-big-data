@@ -6,7 +6,9 @@ import {
   Wallet,
   LayoutDashboard,
   Settings,
+  ArrowLeft,
   ChevronRight,
+  ChartBarIncreasing,
 } from "lucide-react-native";
 
 import ConfirmaVoltar from "@/components/ConfirmaVoltar";
@@ -46,6 +48,12 @@ export default function MenuPrincipal() {
       rota: "/dashboard",
     },
     {
+      titulo: "Relatórios",
+      descricao: "Gere ou consulte relatórios",
+      Icone: ChartBarIncreasing,
+      rota: "/relatorios",
+    },
+    {
       titulo: "Configurações",
       descricao: "Personalize o aplicativo",
       Icone: Settings,
@@ -66,8 +74,20 @@ export default function MenuPrincipal() {
         <View
           style={[styles.header, { backgroundColor: theme.backgroundElement }]}
         >
-          <View style={styles.headerTexts}>
-            <ThemedText style={styles.titulo}>Menu Principal</ThemedText>
+          <View style={styles.headerTitleRow}>
+            {/* <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              accessibilityRole="button"
+              accessibilityLabel="Voltar"
+              hitSlop={8}
+            >
+              <ArrowLeft size={24} color={theme.text} />
+            </TouchableOpacity> */}
+
+            <View style={styles.headerTexts}>
+              <ThemedText style={styles.titulo}>Menu Principal</ThemedText>
+            </View>
           </View>
 
           <ThemedText style={styles.subtitulo}>
@@ -116,6 +136,7 @@ export default function MenuPrincipal() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: "10%",
   },
   scrollContent: {
     paddingBottom: 24,
@@ -129,6 +150,17 @@ const styles = StyleSheet.create({
     borderBottomColor: "#D8DEE8",
   },
 
+  headerTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   headerTexts: {
     flex: 1,
   },

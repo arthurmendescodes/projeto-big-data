@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Keyboard,
   TouchableWithoutFeedback,
-  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -27,7 +26,7 @@ import { ThemedTextInput } from "@/components/ThemedTextInput";
 //----------------------------------------------------------------------------
 
 // Essa tela index.jsx é a primeira que aparece e é a tela de login
-const index = () => {
+const Index = () => {
   // usa o expo-router pra pra navegação entre telas
   const router = useRouter();
 
@@ -37,8 +36,16 @@ const index = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const Login = async () => {
-    router.push("/home");
-    // router.push("/addEvento");
+    try {
+      router.push("/home");
+      // await signInWithEmailAndPassword(auth, email, senha);
+      // Alert.alert("Login realizado com sucesso!");
+      // router.push('/home');
+      // setEmail('');
+      // setSenha('');
+    } catch (e) {
+      Alert.alert("Erro no login. Tente novamente.");
+    }
   };
 
   return (
@@ -81,7 +88,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 const styles = StyleSheet.create({
   container: {
