@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Calendars,
   CalendarPlus,
+  CalendarClock,
 } from "lucide-react-native";
 
 import { ThemedView } from "@/components/themed-view";
@@ -21,10 +22,16 @@ export default function MenuPrincipal() {
 
   const opcoes = [
     {
-      titulo: "Adicionar Evento",
-      descricao: "Registre eventos",
+      titulo: "Agendar Evento",
+      descricao: "Cadastre novos eventos",
       Icone: CalendarPlus,
       rota: "/addEvento",
+    },
+    {
+      titulo: "Eventos Agendados",
+      descricao: "Consulte e gerencie os eventos",
+      Icone: CalendarClock,
+      rota: "/eventosAgendados",
     },
     {
       titulo: "Histórico de Eventos",
@@ -48,7 +55,7 @@ export default function MenuPrincipal() {
           style={[styles.header, { backgroundColor: theme.backgroundElement }]}
         >
           <View style={styles.headerTexts}>
-            <ThemedText style={styles.titulo}>Menu Principal</ThemedText>
+            <ThemedText style={styles.titulo}>Menu de Eventos</ThemedText>
           </View>
 
           <ThemedText style={styles.subtitulo}>

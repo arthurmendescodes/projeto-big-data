@@ -3,10 +3,9 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  KeyboardAvoidingView,
 } from "react-native";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
@@ -14,27 +13,171 @@ import { useTheme } from "@/hooks/use-theme";
 
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@expo/ui/community/datetime-picker";
-import { Color } from "expo-router";
+
+import { apiFetch } from "../../services/api";
+
+type TipoEvento = {
+  id: number;
+  name: string;
+};
 
 export default function AddEvento() {
   const theme = useTheme();
 
   const [tipoEvento, setTipoEvento] = useState("");
-  const [local, setLocal] = useState("");
+  const [nomeEvento, setNomeEvento] = useState("");
   const [date, setDate] = useState(new Date());
+  const [horario, setHorario] = useState("");
+  const [local, setLocal] = useState("");
   const [obs, setObs] = useState("");
-  const [mode, setMode] = useState<"date" | "time">("date");
   const [show, setShow] = useState(false);
 
+  const [salvando, setSalvando] = useState(false);
+  const envioEmAndamento = useRef(false);
+  const [erroSalvar, setErroSalvar] = useState<string | null>(null);
+  const [sucesso, setSucesso] = useState<string | null>(null);
+
+  const [tiposEventos, setTiposEventos] = useState<TipoEvento[]>([]);
+  const [carregandoTipos, setCarregandoTipos] = useState(true);
+  const [erroTipos, setErroTipos] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function carregarTiposEventos() {
+      try {
+        setCarregandoTipos(true);
+        setErroTipos(null);
+
+        const resposta = await apiFetch("/event-types");
+
+        if (!resposta.ok) {
+          throw new Error("Não foi possível consultar os tipos de eventos.");
+        }
+
+        const dados = await resposta.json();
+
+        setTiposEventos(dados);
+
+      } catch (erro) {
+        setErroTipos(
+          erro instanceof Error
+            ? erro.message
+            : "Erro ao carregar tipos de eventos."
+        );
+
+      } finally {
+        setCarregandoTipos(false);
+      }
+    }
+
+    carregarTiposEventos();
+  }, []);
+
   const showDatepicker = () => {
-    setMode("date");
     setShow(true);
   };
 
-  const showTimepicker = () => {
-    setMode("time");
-    setShow(true);
-  };
+  // Preserva a data local selecionada, sem conversão para UTC.
+  function formatarData(data: Date): string {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    const dia = String(data.getDate()).padStart(2, "0");
+
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  async function agendarEvento() {
+    if (envioEmAndamento.current) return;
+
+    setErroSalvar(null);
+    setSucesso(null);
+
+    if (!nomeEvento.trim()) {
+      setErroSalvar("Informe o nome do evento.");
+      return;
+    }
+
+    const tipoId = Number(tipoEvento);
+
+    if (
+      !Number.isSafeInteger(tipoId) ||
+      tipoId <= 0 ||
+      !tiposEventos.some((tipo) => tipo.id === tipoId)
+    ) {
+      setErroSalvar("Selecione o tipo de evento.");
+      return;
+    }
+
+    if (Number.isNaN(date.getTime())) {
+      setErroSalvar("Selecione uma data válida.");
+      return;
+    }
+
+    const endereco = local.trim();
+    const hora = horario.trim();
+
+    if (!endereco || endereco.length > 300) {
+      setErroSalvar("Informe o endereço do evento (até 300 caracteres).");
+      return;
+    }
+
+    if (!hora) {
+      setErroSalvar("Informe o horário previsto de realização do evento.");
+      return;
+    }
+
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(hora)) {
+      setErroSalvar("Informe um horário válido no formato HH:MM.");
+      return;
+    }
+
+    envioEmAndamento.current = true;
+    setSalvando(true);
+    setShow(false);
+
+    try {
+      const resposta = await apiFetch("/events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: nomeEvento.trim(),
+          event_type_id: tipoId,
+          event_date: formatarData(date),
+          event_time: hora,
+          location: endereco,
+          description: obs.trim() || null,
+        }),
+      });
+
+      if (!resposta.ok) {
+        const dados = await resposta.json().catch(() => null);
+
+        throw new Error(
+          typeof dados?.error === "string"
+            ? dados.error
+            : "Não foi possível agendar o evento."
+        );
+      }
+
+      setSucesso("Evento agendado com sucesso!");
+      setNomeEvento("");
+      setTipoEvento("");
+      setObs("");
+      setDate(new Date());
+      setHorario("");
+      setLocal("");
+    } catch (erro) {
+      setErroSalvar(
+        erro instanceof Error
+          ? erro.message
+          : "Erro ao agendar evento."
+      );
+    } finally {
+      envioEmAndamento.current = false;
+      setSalvando(false);
+    }
+  }
 
   return (
     <ThemedView
@@ -50,11 +193,11 @@ export default function AddEvento() {
           style={[styles.header, { backgroundColor: theme.backgroundElement }]}
         >
           <View style={styles.headerTexts}>
-            <ThemedText style={styles.titulo}>Registrar Evento</ThemedText>
+            <ThemedText style={styles.titulo}>Agendar Evento</ThemedText>
           </View>
 
           <ThemedText style={styles.subTitulo}>
-            Preencha os dados do evento para registrar no sistema.
+            Preencha os dados para agendar um evento no sistema.
           </ThemedText>
         </View>
 
@@ -77,24 +220,50 @@ export default function AddEvento() {
             ]}
           >
             <Picker
-              style={[styles.picker, { backgroundColor: theme.background }]}
+              style={[
+                styles.picker,
+                {
+                  backgroundColor: theme.background,
+                  color: theme.text,
+                },
+              ]}
               selectedValue={tipoEvento}
               onValueChange={(value) => setTipoEvento(value)}
+              enabled={!salvando && !carregandoTipos && !erroTipos}
             >
               <Picker.Item
-                style={{ backgroundColor: theme.background, color: theme.text }}
-                label="Missa"
-                value="missa"
+                label={
+                  carregandoTipos
+                    ? "Carregando tipos..."
+                    : "Selecione o tipo de evento"
+                }
+                value=""
               />
-              <Picker.Item label="Procissão" value="procissao" />
-              <Picker.Item label="Festa" value="festa" />
-              <Picker.Item label="Leilão" value="leilao" />
-              <Picker.Item label="Bingo" value="bingo" />
-              <Picker.Item label="Outro" value="outro" />
+
+              {tiposEventos.map((tipo) => (
+                <Picker.Item
+                  key={tipo.id}
+                  label={tipo.name}
+                  value={String(tipo.id)}
+                />
+              ))}
             </Picker>
           </View>
 
-          <ThemedText style={styles.categoria}>Local</ThemedText>
+          {erroTipos && (
+            <ThemedText style={styles.erroMensagem}>{erroTipos}</ThemedText>
+          )}
+
+          {!carregandoTipos && !erroTipos && tiposEventos.length === 0 && (
+            <ThemedText style={styles.erroMensagem}>
+              Nenhum tipo de evento cadastrado.
+            </ThemedText>
+          )}
+
+          <ThemedText style={styles.categoria}>
+            Nome do evento
+          </ThemedText>
+
           <ThemedTextInput
             style={[
               styles.input,
@@ -103,11 +272,13 @@ export default function AddEvento() {
                 backgroundColor: theme.background,
               },
             ]}
-            placeholder="Local..."
-            value={local}
-          ></ThemedTextInput>
+            placeholder="Nome do evento..."
+            value={nomeEvento}
+            onChangeText={setNomeEvento}
+            editable={!salvando}
+          />
 
-          <ThemedText style={styles.categoria}>Data</ThemedText>
+          <ThemedText style={styles.categoria}>Data prevista de realização</ThemedText>
 
           <TouchableOpacity
             style={[
@@ -118,47 +289,30 @@ export default function AddEvento() {
               },
             ]}
             onPress={showDatepicker}
+            disabled={salvando}
           >
-            {/* <ThemedText style={styles.dateIcon}>▦</ThemedText> */}
             <ThemedText style={styles.dateText}>
               {date.toLocaleDateString("pt-BR")}
-            </ThemedText>
-          </TouchableOpacity>
-
-          <ThemedText style={styles.categoria}>Horário</ThemedText>
-
-          <TouchableOpacity
-            style={[
-              styles.dateButton,
-              {
-                borderColor: theme.backgroundSelected,
-                backgroundColor: theme.background,
-              },
-            ]}
-            onPress={showTimepicker}
-          >
-            <ThemedText style={styles.dateText}>
-              {date.toLocaleTimeString("pt-BR", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
             </ThemedText>
           </TouchableOpacity>
 
           {show && (
             <DateTimePicker
               value={date}
-              mode={mode}
+              mode="date"
               onValueChange={(selectedDate) => {
-                setDate(new Date(selectedDate.nativeEvent.timestamp));
+                const novaData = new Date(selectedDate.nativeEvent.timestamp);
+                if (!Number.isNaN(novaData.getTime())) {
+                  setDate(novaData);
+                }
                 setShow(false);
               }}
               onDismiss={() => setShow(false)}
             />
           )}
 
-          {/* Baixas */}
-          <ThemedText style={styles.categoria}>Baixas</ThemedText>
+          <ThemedText style={styles.categoria}>Horário previsto de realização (obrigatório)</ThemedText>
+
           <ThemedTextInput
             style={[
               styles.input,
@@ -167,25 +321,29 @@ export default function AddEvento() {
                 backgroundColor: theme.background,
               },
             ]}
-            placeholder="Baixas..."
-            value={obs}
-            onChangeText={setObs}
-            multiline
+            placeholder="HH:MM (ex.: 19:30)"
+            value={horario}
+            onChangeText={setHorario}
+            maxLength={5}
+            editable={!salvando}
           />
 
-          {/* Entradas */}
-          <ThemedText style={styles.categoria}>Entradas</ThemedText>
+          <ThemedText style={styles.categoria}>Local do evento</ThemedText>
+
           <ThemedTextInput
             style={[
               styles.input,
               {
                 borderColor: theme.backgroundSelected,
                 backgroundColor: theme.background,
+                minHeight: 76,
               },
             ]}
-            placeholder="Entradas..."
-            value={obs}
-            onChangeText={setObs}
+            placeholder="Rua ..., Bairro ..., Cidade ..., Número ..."
+            value={local}
+            onChangeText={setLocal}
+            maxLength={300}
+            editable={!salvando}
             multiline
           />
 
@@ -203,19 +361,39 @@ export default function AddEvento() {
             placeholder="Observações..."
             value={obs}
             onChangeText={setObs}
+            editable={!salvando}
             multiline
           />
         </View>
 
         {/* Salvar */}
         <TouchableOpacity
-          style={styles.btnSalvar}
-          onPress={() => {
-            // fução pra salvar o evento
-          }}
+          style={[
+            styles.btnSalvar,
+            {
+              opacity:
+                salvando || carregandoTipos || !!erroTipos || tiposEventos.length === 0
+                  ? 0.5
+                  : 1,
+            },
+          ]}
+          onPress={agendarEvento}
+          disabled={
+            salvando || carregandoTipos || !!erroTipos || tiposEventos.length === 0
+          }
         >
-          <ThemedText style={styles.btnSalvarTexto}>Salvar evento</ThemedText>
+          <ThemedText style={styles.btnSalvarTexto}>
+            {salvando ? "Agendando..." : "Agendar evento"}
+          </ThemedText>
         </TouchableOpacity>
+
+        {erroSalvar && (
+          <ThemedText style={styles.erroMensagem}>{erroSalvar}</ThemedText>
+        )}
+
+        {sucesso && (
+          <ThemedText style={styles.sucessoMensagem}>{sucesso}</ThemedText>
+        )}
 
         <ThemedText style={styles.footer}>
           Revise os dados antes de salvar para manter o controle da igreja
@@ -228,7 +406,6 @@ export default function AddEvento() {
 
 const styles = StyleSheet.create({
   container: {
-    // paddingBottom: "10%",
     flex: 1,
   },
 
@@ -244,21 +421,8 @@ const styles = StyleSheet.create({
     borderBottomColor: "#D8DEE8",
   },
 
-  headerTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-
   headerTexts: {
     flex: 1,
-  },
-
-  eyebrow: {
-    fontSize: 10,
-    letterSpacing: 1.2,
-    marginBottom: 6,
-    color: "#64748B",
   },
 
   titulo: {
@@ -270,20 +434,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     marginTop: 12,
-    // color: "#7B8AA4",
-  },
-
-  badge: {
-    backgroundColor: "#EFF6FF",
-    paddingHorizontal: 11,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginLeft: 10,
-  },
-
-  badgeText: {
-    color: "#2563EB",
-    fontSize: 10,
   },
 
   card: {
@@ -319,7 +469,6 @@ const styles = StyleSheet.create({
     height: 60,
     width: "100%",
   },
-  pickerItem: {},
 
   dateButton: {
     minHeight: 44,
@@ -331,60 +480,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 
-  dateIcon: {
-    fontSize: 19,
-    color: "#64748B",
-  },
-
   dateText: {
     fontSize: 12,
-  },
-
-  listBox: {
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-  },
-
-  listRow: {
-    minHeight: 42,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
-  },
-
-  itemText: {
-    fontSize: 11,
-    flexShrink: 1,
-  },
-
-  rowDivider: {
-    height: StyleSheet.hairlineWidth,
-  },
-
-  badgeSaida: {
-    backgroundColor: "#FEF2F2",
-    borderRadius: 20,
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-  },
-
-  textSaida: {
-    color: "#DC2626",
-    fontSize: 9,
-  },
-
-  badgeEntrada: {
-    backgroundColor: "#ECFDF5",
-    borderRadius: 20,
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-  },
-
-  textEntrada: {
-    color: "#059669",
-    fontSize: 9,
   },
 
   input: {
@@ -395,29 +492,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 12,
     textAlignVertical: "top",
-  },
-
-  resumo: {
-    marginHorizontal: 20,
-    marginTop: 16,
-    padding: 13,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#BFDBFE",
-    backgroundColor: "#EFF6FF",
-  },
-
-  resumoTitulo: {
-    color: "#1D4ED8",
-    fontSize: 11,
-    fontWeight: "600",
-    marginBottom: 7,
-  },
-
-  resumoTexto: {
-    color: "#4169A9",
-    fontSize: 11,
-    lineHeight: 16,
   },
 
   btnSalvar: {
@@ -434,6 +508,22 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 12,
     fontWeight: "600",
+  },
+
+  erroMensagem: {
+    color: "#DC2626",
+    textAlign: "center",
+    marginHorizontal: 20,
+    marginTop: 12,
+    fontSize: 13,
+  },
+
+  sucessoMensagem: {
+    color: "#059669",
+    textAlign: "center",
+    marginHorizontal: 20,
+    marginTop: 12,
+    fontSize: 13,
   },
 
   footer: {

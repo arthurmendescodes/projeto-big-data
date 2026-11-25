@@ -15,6 +15,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 
+import { API_URL } from "@/services/api";
+
 //----------------------------------------------------------------------------
 
 //import de imagens
@@ -26,19 +28,66 @@ import { ThemedView } from "@/components/themed-view";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 //----------------------------------------------------------------------------
 
+// imports do backend
+import { useAuth } from "@/components/AuthContext";
+//----------------------------------------------------------------------------
+
+
 // Essa tela index.jsx é a primeira que aparece e é a tela de login
 const index = () => {
   // usa o expo-router pra pra navegação entre telas
   const router = useRouter();
 
+  // acesso a função login do AuthProvider
+  const { login } = useAuth();
+
   // variáveis dos inputs (nome e senha).
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const Login = async () => {
-    router.push("/home");
-    // router.push("/addEvento");
+  // Verifica se os campos foram preenchidos
+    if (!email.trim() || !senha) {
+      window.alert("Preencha o email e a senha.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Envia as credenciais para o backend
+      const resposta = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          senha: senha,
+        }),
+      });
+
+      // Recebe a resposta do servidor
+      const dados = await resposta.json();
+
+      // Verifica se houve erro na autenticação
+      if (!resposta.ok) {
+        throw new Error(dados.error || "Erro ao realizar login.");
+      }
+
+      // Armazena os tokens e atualiza o contexto de autenticação
+      await login(dados.access_token, dados.refresh_token);
+
+    } catch (erro) {
+      const mensagem =
+        erro instanceof Error ? erro.message : "Erro desconhecido.";
+
+      window.alert(mensagem);
+
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -71,8 +120,18 @@ const index = () => {
         />
         {/* botão de login que chama a função logar */}
         <ThemedView>
-          <TouchableOpacity style={styles.botaoLogin} onPress={Login}>
-            <ThemedText style={styles.botaoTexto}>Entrar</ThemedText>
+          <TouchableOpacity
+            style={styles.botaoLogin}
+            onPress={Login}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <ThemedText style={styles.botaoTexto}>
+                Entrar
+              </ThemedText>
+            )}
           </TouchableOpacity>
         </ThemedView>
       </ThemedView>

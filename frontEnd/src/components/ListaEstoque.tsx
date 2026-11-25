@@ -16,28 +16,18 @@ import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@expo/ui/community/datetime-picker";
 import { Color } from "expo-router";
 
-export const DADOSESTOQUE = [
-  {
-    id: 1,
-    nome: "Vinho",
-    quantidade: 10,
-  },
-  {
-    id: 2,
-    nome: "Hóstia",
-    quantidade: 500,
-  },
-  {
-    id: 3,
-    nome: "Vela",
-    quantidade: 20,
-  },
-];
+export type EstoqueItem = {
+  product_id: number;
+  product_name: string;
+  unit: string;
+  minimum_stock: number;
+  current_quantity: number;
+};
 
 export default function ListaEstoque({
   item,
 }: {
-  item: (typeof DADOSESTOQUE)[number];
+  item: EstoqueItem;
 }): JSX.Element {
   const theme = useTheme();
   return (
@@ -51,9 +41,12 @@ export default function ListaEstoque({
       ]}
     >
       <View style={styles.textoContainer}>
-        <ThemedText style={styles.tipoEvento}>{item.nome}</ThemedText>
+        <ThemedText style={styles.tipoEvento}>
+          {item.product_name}
+        </ThemedText>
+
         <ThemedText style={styles.metaDados}>
-          ID: {item.id} · Quantidade: {item.quantidade}
+          ID: {item.product_id} · Quantidade: {item.current_quantity} {item.unit}
         </ThemedText>
       </View>
     </TouchableOpacity>

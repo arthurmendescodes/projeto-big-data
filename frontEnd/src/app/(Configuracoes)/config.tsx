@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Calendars,
   CalendarPlus,
+  LogOut,
 } from "lucide-react-native";
 
 import { useTheme } from "@/hooks/use-theme";
@@ -24,9 +25,11 @@ import { useTheme } from "@/hooks/use-theme";
 import { useAppTheme } from "@/components/ThemeContext";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useAuth } from "@/components/AuthContext";
 
 export default function Configuracoes() {
   const { themeMode, changeTheme } = useAppTheme();
+  const { logout } = useAuth();
 
   const theme = useTheme();
   return (
@@ -81,6 +84,37 @@ export default function Configuracoes() {
               </ThemedText>
             </View>
           </ThemedView>
+
+          <TouchableOpacity
+            style={[
+              styles.botao,
+              {
+                backgroundColor: theme.backgroundElement,
+                borderColor: theme.backgroundSelected,
+              },
+            ]}
+            onPress={logout}
+            >
+            <View
+              style={[
+                styles.areaIcone,
+                { backgroundColor: theme.backgroundSelected },
+              ]}
+              >
+              <LogOut size={24} color="#DC2626" />
+            </View>
+
+            <View style={styles.textos}>
+              <ThemedText style={[styles.opcao, { color: "#DC2626" }]}>
+                Sair da conta
+              </ThemedText>
+
+              <ThemedText style={styles.descricao}>
+                Encerrar sua sessão
+              </ThemedText>
+            </View>
+          </TouchableOpacity>
+
         </View>
       </ScrollView>
     </ThemedView>
